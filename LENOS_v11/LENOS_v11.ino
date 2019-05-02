@@ -267,7 +267,7 @@ String getBalance() {
        #ifdef DEBUG
       Serial.println(F("Check balance OK"));
       #endif
-      if (string.indexOf(F("STB:")) != -1) {            // *101#
+      if (string.indexOf(F("47491466")) != -1) {            // *101#
         balance = string.substring(string.indexOf(F("c:")) + 2, string.indexOf(F("d")));
           //#ifdef DEBUG
 //        Serial.println(F("BALANCE: "));
@@ -545,9 +545,11 @@ void setup() {
 
 void loop() {
   digitalWrite(PIN_STATUS, HIGH);
+  sim.flush();
   loopCheckSMS(); // NEED TO CHECK PROCESSINGSTRING
+  sim.flush();
   loopCheckTemp();
   loopCheck12V();
   digitalWrite(PIN_STATUS, LOW);
-  delay(3000);
+  delay(5000);
 }

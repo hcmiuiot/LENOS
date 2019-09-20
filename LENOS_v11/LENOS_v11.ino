@@ -43,7 +43,9 @@ void statusInfBlink(uint64_t onTime = 200, uint64_t offTime = 200) {
 
 bool loopCheck12V() {
   now = digitalRead(PROBE);
-  if (now != before) {
+  
+  if (now != before) {            
+//    perfect runnable code
       if (now == HIGH) {
         broadcastSms2Clients(NOTICE_LOST_ELECTRICITY);
       } else
@@ -551,5 +553,5 @@ void loop() {
   loopCheckTemp();
   loopCheck12V();
   digitalWrite(PIN_STATUS, LOW);
-  delay(5000);
+  delay(1000);
 }

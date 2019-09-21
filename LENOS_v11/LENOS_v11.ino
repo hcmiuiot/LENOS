@@ -3,11 +3,12 @@
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
 
-//    #define DEBUG
+//#define DEBUG
 
 #define PROBE A1
 
 String string;
+String date;
 
 bool before = 0;
 bool now = 0;
@@ -42,7 +43,7 @@ void statusInfBlink(uint64_t onTime = 200, uint64_t offTime = 200) {
 }
 
 bool loopCheck12V() {
-  now = digitalRead(PROBE);
+  now = analogRead(PROBE);
   
   if (now != before) {            
 //    perfect runnable code
@@ -270,15 +271,26 @@ String getBalance() {
       Serial.println(F("Check balance OK"));
       #endif
       if (string.indexOf(F("47491466")) != -1) {            // *101#
-        balance = string.substring(string.indexOf(F("c:")) + 2, string.indexOf(F("d")));
-          //#ifdef DEBUG
+        balance = string.substring(string.indexOf(F("G:")) + 2, string.indexOf(F("d")));
+        date = string.substring(string.indexOf(F(" ngay ")) + 6, string.indexOf(F("20"))+10);
+//          #ifdef DEBUG
 //        Serial.println(F("BALANCE: "));
 //        Serial.println(balance);
-          //#endif
-        int balanceInt = balance.toInt();
+//          #endif
+        balance.trim();
+        long balanceInt = str2long(balance);
+          #ifdef DEBUG
+//        Serial.println(F("BALANCE before int: a"));
+//        Serial.println(balance);  
+//        Serial.println(F("BALANCE in int: a"));
+//        Serial.println(balanceInt);
+//        Serial.println(F(" d"));
+          Serial.println("Date: ");
+          Serial.println(date);
+          #endif
         bool broke = balanceInt <= THRESHOLD_BALANCE;
         if (broke) {
-          broadcastSms2Clients(NOTICE_BROKE);
+//          broadcastSms2Clients(NOTICE_BROKE);
           #ifdef DEBUG
           Serial.println(F("Broke!!!!"));
           #endif
@@ -412,11 +424,11 @@ void processSms(String phoneNum, String smsContent) {
       if (getPhoneNumIndex(phoneNum) != -1) {
         String elecStat;
         balance = getBalance();
-        if (digitalRead(PROBE) == LOW)
+        if (analogRead(PROBE) == LOW)
           elecStat = "POWER OK";
         else
           elecStat = "LOST POWER";
-        sendSmsExAdd0(phoneNum.c_str(), String("Balance: " + balance + "." + " Temperature: " + String(mlx.readAmbientTempC()) + "*C. " + elecStat).c_str());
+        sendSmsExAdd0(phoneNum.c_str(), String("Balance: " + balance + "." + " Temperature: " + String(mlx.readAmbientTempC()) + "*C. " + elecStat + " Date: " + date).c_str());
   
       } else {
         sendSmsExAdd0(phoneNum.c_str(), NOTICE_CANCEL_REGISTER_FAIL);
@@ -510,8 +522,8 @@ void setup() {
   pinMode(A2, INPUT);
   pinMode(A3, INPUT);
 
-  before = digitalRead(PROBE);
-  now = digitalRead(PROBE);
+  before = analogRead(PROBE);
+  now = analogRead(PROBE);
 
   // SET LED PINS MODE
   pinMode(PIN_STATUS, OUTPUT);

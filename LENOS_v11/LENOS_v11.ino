@@ -10,8 +10,8 @@
 String string;
 String date;
 
-bool before = 0;
-bool now = 0;
+int before = 0;
+int now = 0;
 
 //################ OTHERS #################
 //char* string2char(String command) {
@@ -47,10 +47,13 @@ bool loopCheck12V() {
   
   if (now != before) {            
 //    perfect runnable code
-      if (now == HIGH) {
+//      if (now == HIGH) {
+      if (now > 1021) {
         broadcastSms2Clients(NOTICE_LOST_ELECTRICITY);
-      } else
-        broadcastSms2Clients(NOTICE_RETURN_ELECTRICITY);     
+      }
+      if (now < 42) {
+        broadcastSms2Clients(NOTICE_RETURN_ELECTRICITY);
+      }     
   }
   before = now;
 }
@@ -424,7 +427,8 @@ void processSms(String phoneNum, String smsContent) {
       if (getPhoneNumIndex(phoneNum) != -1) {
         String elecStat;
         balance = getBalance();
-        if (analogRead(PROBE) == LOW)
+//        if (analogRead(PROBE) == LOW)
+        if (analogRead(PROBE) < 5)
           elecStat = "POWER OK";
         else
           elecStat = "LOST POWER";
